@@ -127,6 +127,11 @@ export function Dashboard({
 }: DashboardProps) {
   const t = useT();
   const [lang] = useLang();
+  const now = new Date();
+  const hour = now.getHours();
+  const dateLocale = lang === 'ru' ? 'ru-RU' : 'en-US';
+  const greeting = hour < 12 ? t('dash_morning') : hour < 17 ? t('dash_afternoon') : t('dash_evening');
+
   const velocityTotal = velocity.reduce((s, v) => s + v, 0);
   const zombies = projects.filter(p => p.zombie);
   const activeCount = projects.filter(p => p.status === 'active').length;
@@ -136,11 +141,6 @@ export function Dashboard({
   const userInitials = userName
     ? userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
     : '?';
-
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 12 ? t('dash_morning') : hour < 17 ? t('dash_afternoon') : t('dash_evening');
-  const dateLocale = lang === 'ru' ? 'ru-RU' : 'en-US';
   const dateStr = now.toLocaleDateString(dateLocale, { weekday: 'long', month: 'long', day: 'numeric' });
   const displayName = userName ? userName.split(' ')[0] : 'there';
 

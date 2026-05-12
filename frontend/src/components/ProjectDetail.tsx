@@ -14,24 +14,18 @@ function genId() {
   return Math.random().toString(36).slice(2, 9);
 }
 
-const DEFAULT_NOTES = `# Project notes
+const NOTES_PLACEHOLDER = `# Project notes
 
 Use this space for decisions, ideas, and anything worth remembering.
 
 ## Goals
-- What are you trying to achieve with this project?
-- Who is this for?
+- What are you trying to achieve?
 
 ## Decisions log
-_Record important decisions with brief rationale. Date them._
+_Record important decisions with brief rationale._
 
-## Ideas / backlog
-_Loose thoughts that don't belong on the board yet._
-
-## Links
-- Repo:
-- Design file:
-- Docs: `;
+## Ideas
+_Loose thoughts that don't belong on the board yet._`;
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -137,10 +131,44 @@ function RepoModal({ projectId, onClose }: { projectId: string; onClose: () => v
 
 // ─── Root component ─────────────────────────────────────────────────
 
+function useProjectAvatar(projectId: string) {
+  const key = `bb_avatar_${projectId}`;
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => localStorage.getItem(key));
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => fileRef.current?.click();
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = reader.result as string;
+      localStorage.setItem(key, url);
+      setAvatarUrl(url);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const input = (
+    <input
+      ref={fileRef}
+      type="file"
+      accept="image/*"
+      onChange={handleFile}
+      style={{ display: 'none' }}
+    />
+  );
+
+  return { avatarUrl, handleClick, input };
+}
+
 export function ProjectDetail({ project, onBack, kanban, onKanbanChange, addActivity, onProjectUpdate }: ProjectDetailProps) {
   const t = useT();
   const [tab, setTab] = useState<'kanban' | 'timeline' | 'risks' | 'notes'>('kanban');
   const [repoModalOpen, setRepoModalOpen] = useState(false);
+  const { avatarUrl, handleClick: handleAvatarClick, input: avatarInput } = useProjectAvatar(project.id);
 
   const tabs = [
     { id: 'kanban'   as const, label: t('tab_kanban'),   Icon: IconList     },
@@ -162,13 +190,26 @@ export function ProjectDetail({ project, onBack, kanban, onKanbanChange, addActi
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, marginBottom: 18 }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-            <span className="font-mono" style={{
-              width: 40, height: 40, borderRadius: 7,
-              background: 'hsl(var(--surface-2))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 13, fontWeight: 600, letterSpacing: '0.05em',
-              color: 'hsl(var(--foreground))',
-              border: '1px solid hsl(var(--border))',
-            }}>{project.emoji}</span>
+            {avatarInput}
+            <button
+              onClick={handleAvatarClick}
+              title="Change avatar"
+              style={{
+                width: 40, height: 40, borderRadius: 7, padding: 0,
+                background: 'hsl(var(--surface-2))',
+                border: '1px solid hsl(var(--border))',
+                overflow: 'hidden', cursor: 'default', flexShrink: 0,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border-color 120ms ease',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = 'hsl(var(--border-strong))')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = 'hsl(var(--border))')}
+            >
+              {avatarUrl
+                ? <img src={avatarUrl} alt={project.emoji} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <span className="font-mono" style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', color: 'hsl(var(--foreground))' }}>{project.emoji}</span>
+              }
+            </button>
             <div>
               <h1 className="t-h2" style={{ margin: 0, marginBottom: 2 }}>{project.name}</h1>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>
@@ -1064,8 +1105,8 @@ function Notes({ projectId }: { projectId: string }) {
 
   useEffect(() => {
     api.notes.get(projectId)
-      .then(r => setContent(r?.content || DEFAULT_NOTES))
-      .catch(() => setContent(DEFAULT_NOTES));
+      .then(r => setContent(r?.content || ''))
+      .catch(() => setContent(''));
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [projectId]);
 
@@ -1080,8 +1121,8 @@ function Notes({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14, alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14, alignItems: 'center', flexShrink: 0 }}>
         <div className="t-h3">{t('notes_title')}</div>
         <span style={{ fontSize: 12, color: 'hsl(var(--muted-foreground))' }}>
           {saved ? t('notes_saved') : t('notes_saving')}
@@ -1090,19 +1131,21 @@ function Notes({ projectId }: { projectId: string }) {
       <textarea
         value={content}
         onChange={handleChange}
+        placeholder={NOTES_PLACEHOLDER}
         spellCheck={false}
         style={{
-          width: '100%', maxWidth: 720,
-          minHeight: 420,
+          flex: 1,
+          width: '100%',
+          minHeight: 'calc(100vh - 260px)',
           background: 'hsl(var(--card))',
           border: '1px solid hsl(var(--border))',
           borderRadius: 'var(--radius)',
           color: 'hsl(var(--foreground))',
-          fontSize: 14,
+          fontSize: 15,
           fontFamily: 'inherit',
-          lineHeight: 1.65,
-          padding: '20px 28px',
-          resize: 'vertical',
+          lineHeight: 1.7,
+          padding: '24px 32px',
+          resize: 'none',
           outline: 'none',
           boxSizing: 'border-box',
           display: 'block',
