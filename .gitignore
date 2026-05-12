@@ -39,5 +39,6 @@ Thumbs.db
 .idea/
 *.swp
 
-# Claude Flow
+# Claude
+.claude/
 .claude-flow/
