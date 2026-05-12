@@ -119,6 +119,8 @@ export const api = {
       req<Project>('/projects', { method: 'POST', body: JSON.stringify(data) }),
     update: (projectId: string, data: Partial<Omit<Project, 'id'>> & { deadline?: string | null }) =>
       req<Project>(`/projects/${projectId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (projectId: string) =>
+      req<void>(`/projects/${projectId}`, { method: 'DELETE' }),
   },
 
   milestones: {

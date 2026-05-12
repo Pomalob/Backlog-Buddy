@@ -2,11 +2,12 @@ import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from app.api.deps import get_current_user, get_project_for_user, get_session
-from app.models import User, Project
+from app.models import User, Project, Task, Milestone, Risk, Note, Reminder
 from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectOut
 from app.services.health_score import recalculate_project
 
@@ -91,5 +92,11 @@ async def delete_project(
     project: Project = Depends(get_project_for_user),
     session: AsyncSession = Depends(get_session),
 ):
+    pid = project.id
+    await session.execute(sa_delete(Reminder).where(Reminder.project_id == pid))
+    await session.execute(sa_delete(Note).where(Note.project_id == pid))
+    await session.execute(sa_delete(Risk).where(Risk.project_id == pid))
+    await session.execute(sa_delete(Milestone).where(Milestone.project_id == pid))
+    await session.execute(sa_delete(Task).where(Task.project_id == pid))
     await session.delete(project)
     await session.commit()
