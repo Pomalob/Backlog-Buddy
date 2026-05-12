@@ -1,0 +1,136 @@
+import type { Project, KanbanData, ActivityItem, Milestone, Risk } from './types';
+
+export const PROJECTS: Project[] = [
+  {
+    id: 'bb',
+    name: 'Backlog Buddy',
+    emoji: 'BB',
+    color: 'hsl(var(--surface-2))',
+    goal: 'Ship a calmer PM tool for solo devs — MVP launches end of Q2 with auth, projects, and Kanban.',
+    status: 'active',
+    health: 82,
+    progress: 64,
+    due: 'Jun 14',
+    tags: ['saas', 'react', 'side-project'],
+    velocity: [3, 5, 4, 6, 8, 7, 9, 5, 6, 8, 4, 7],
+    lastActive: '2h ago',
+  },
+  {
+    id: 'rn',
+    name: 'Recipe Nook',
+    emoji: 'RN',
+    color: 'hsl(var(--surface-2))',
+    goal: 'iOS app for archiving family recipes with offline-first sync.',
+    status: 'active',
+    health: 56,
+    progress: 38,
+    due: 'Aug 02',
+    tags: ['ios', 'swift'],
+    velocity: [2, 3, 4, 2, 1, 3, 2, 1, 0, 2, 3, 1],
+    lastActive: '1d ago',
+  },
+  {
+    id: 'tg',
+    name: 'Tidegraph',
+    emoji: 'TG',
+    color: 'hsl(var(--surface-2))',
+    goal: 'Tide & weather dashboard for surfers, scraping NOAA into a daily forecast.',
+    status: 'paused',
+    health: 32,
+    progress: 22,
+    due: '—',
+    tags: ['data-viz'],
+    velocity: [1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0],
+    lastActive: '23d ago',
+    zombie: true,
+  },
+  {
+    id: 'fp',
+    name: 'Forestpath',
+    emoji: 'FP',
+    color: 'hsl(var(--surface-2))',
+    goal: 'GPS tracker for trail running with offline maps and elevation profiles.',
+    status: 'idea',
+    health: 78,
+    progress: 8,
+    due: '—',
+    tags: ['mobile', 'maps'],
+    velocity: [0, 0, 1, 2, 3, 4, 3, 2, 5, 4, 6, 5],
+    lastActive: '5h ago',
+  },
+  {
+    id: 'lp',
+    name: 'Loopback',
+    emoji: 'LP',
+    color: 'hsl(var(--surface-2))',
+    goal: 'Browser extension for capturing and replaying API requests during dev.',
+    status: 'active',
+    health: 71,
+    progress: 52,
+    due: 'Jul 20',
+    tags: ['devtool'],
+    velocity: [4, 5, 6, 4, 3, 5, 7, 6, 4, 5, 4, 6],
+    lastActive: '6h ago',
+  },
+  {
+    id: 'qz',
+    name: 'Quartzboard',
+    emoji: 'QZ',
+    color: 'hsl(var(--surface-2))',
+    goal: 'Mechanical-keyboard build journal with parts inventory and timeline.',
+    status: 'paused',
+    health: 41,
+    progress: 30,
+    due: '—',
+    tags: ['hobby', 'static-site'],
+    velocity: [3, 2, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    lastActive: '16d ago',
+    zombie: true,
+  },
+];
+
+export const KANBAN: KanbanData = {
+  Backlog: [
+    { id: 't1', title: 'Design Risk Matrix component with hover tooltips', priority: 'med', due: 'May 06', tags: ['design'], subtaskDone: 0, subtaskTotal: 3, comments: 0 },
+    { id: 't2', title: 'Sketch onboarding flow for first-time users', priority: 'low', tags: ['onboarding'], subtaskDone: 0, subtaskTotal: 0, comments: 1 },
+    { id: 't3', title: 'Add Telegram bot integration for Quick Capture', priority: 'high', due: 'May 14', tags: ['integration', 'bot'], subtaskDone: 0, subtaskTotal: 5, comments: 0 },
+    { id: 't4', title: 'Research dnd-kit accessibility patterns', priority: 'low', tags: ['research'], subtaskDone: 0, subtaskTotal: 0, comments: 0 },
+  ],
+  'In Progress': [
+    { id: 't5', title: 'Implement health-score calculation worker', priority: 'high', due: 'May 02', tags: ['backend'], subtaskDone: 2, subtaskTotal: 4, comments: 3, assignee: 'M' },
+    { id: 't6', title: 'Wire up Kanban drag handle to dnd-kit sensors', priority: 'med', due: 'Apr 24', overdue: true, tags: ['frontend'], subtaskDone: 1, subtaskTotal: 3, comments: 1, assignee: 'M' },
+  ],
+  Review: [
+    { id: 't7', title: 'Risk matrix data model + zod schema', priority: 'med', tags: ['backend'], subtaskDone: 3, subtaskTotal: 3, comments: 2, assignee: 'M' },
+    { id: 't8', title: 'Dashboard velocity chart (recharts)', priority: 'low', tags: ['frontend', 'viz'], subtaskDone: 4, subtaskTotal: 4, comments: 0, assignee: 'M' },
+  ],
+  Done: [
+    { id: 't9', title: 'Set up Tailwind + shadcn theme tokens', priority: 'low', tags: ['setup'], subtaskDone: 1, subtaskTotal: 1, comments: 0, assignee: 'M' },
+    { id: 't10', title: 'Auth via magic link', priority: 'high', tags: ['auth'], subtaskDone: 5, subtaskTotal: 5, comments: 4, assignee: 'M' },
+    { id: 't11', title: 'Project CRUD endpoints', priority: 'med', tags: ['backend'], subtaskDone: 6, subtaskTotal: 6, comments: 1, assignee: 'M' },
+  ],
+};
+
+export const ACTIVITY: ActivityItem[] = [
+  { who: 'you', action: 'moved', what: 'Wire up Kanban drag handle', to: 'In Progress', project: 'Backlog Buddy', when: '12m' },
+  { who: 'you', action: 'completed', what: 'Auth via magic link', project: 'Backlog Buddy', when: '2h' },
+  { who: 'you', action: 'added 3 ideas to', what: 'Loopback', project: 'Loopback', when: '6h' },
+  { who: 'you', action: 'paused', what: 'Tidegraph', project: 'Tidegraph', when: '23d' },
+  { who: 'you', action: 'created', what: 'Forestpath', project: 'Forestpath', when: '1d' },
+];
+
+export const MILESTONES: Milestone[] = [
+  { id: 'm1', label: 'MVP scaffold', date: 'Apr 02', state: 'done', offset: 5 },
+  { id: 'm2', label: 'Kanban v1', date: 'Apr 24', state: 'done', offset: 24 },
+  { id: 'm3', label: 'Risk matrix + Notes', date: 'May 12', state: 'active', offset: 50 },
+  { id: 'm4', label: 'Beta launch', date: 'Jun 14', state: 'todo', offset: 88 },
+];
+
+export const RISKS: Risk[] = [
+  { id: 'r1', title: 'dnd-kit perf with 200+ cards', probability: 2, impact: 1, mitigation: 'Virtualize columns' },
+  { id: 'r2', title: 'Scope creep into team features', probability: 2, impact: 2, mitigation: 'Public roadmap' },
+  { id: 'r3', title: 'Loss of motivation past week 8', probability: 2, impact: 2 },
+  { id: 'r4', title: 'Telegram bot rate limits', probability: 1, impact: 1 },
+  { id: 'r5', title: 'Health-score formula reads wrong signal', probability: 1, impact: 2 },
+  { id: 'r6', title: 'Migration from prototype DB', probability: 0, impact: 2 },
+];
